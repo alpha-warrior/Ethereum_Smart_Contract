@@ -13,7 +13,6 @@ contract Netflix {
         uint buyer_id;
         string buyer_public_key;
         string encrypted_msg;
-        uint public_key_fetched;
     }
 
     uint sellers = 0;
@@ -58,13 +57,13 @@ contract Netflix {
             sellers++;
             reverse_sellers_mapping[msg.sender] = sellers;
             sellers_mapping[sellers] = address(uint160(msg.sender));
-            listedItems.push(Item(listed_items,_name,_description,_price,sellers,0,0,0,"NA","NA",0));
+            listedItems.push(Item(listed_items,_name,_description,_price,sellers,0,0,0,"NA","NA"));
             listed_items++;
         }
         else
         {
             uint temp_seller_id = reverse_sellers_mapping[msg.sender];
-            listedItems.push(Item(listed_items,_name,_description,_price,temp_seller_id,0,0,0,"NA","NA",0));
+            listedItems.push(Item(listed_items,_name,_description,_price,temp_seller_id,0,0,0,"NA","NA"));
             listed_items++;
         }
     }
@@ -109,7 +108,7 @@ contract Netflix {
         {
             listedItems[listing_id].bought = 1;
             listedItems[listing_id].buyer_public_key = _public_key;
-            listedItems[listing_id].buyer_id = buyers;
+            listedItems[listing_id].buyer_id = reverse_buyers_mapping[msg.sender];
         }
     }
 
@@ -118,7 +117,6 @@ contract Netflix {
         require(reverse_sellers_mapping[msg.sender]!=0,"You are not a seller");
         require(listedItems[listing_id].seller_id==reverse_sellers_mapping[msg.sender],"Item is not listed by you");
         require(listedItems[listing_id].bought==1,"Item not bought yet");
-        listedItems[listing_id].public_key_fetched = 1;
         string memory ret = listedItems[listing_id].buyer_public_key;
         
         return ret;
@@ -129,7 +127,6 @@ contract Netflix {
         require(reverse_sellers_mapping[msg.sender]!=0,"You are not a seller");
         require(listedItems[listing_id].seller_id==reverse_sellers_mapping[msg.sender],"Item is not listed by you");
         require(listedItems[listing_id].bought==1,"Item not bought yet");
-        require(listedItems[listing_id].public_key_fetched==1,"Public Key Not Fetched Yet");
         listedItems[listing_id].encrypted_msg = message;
         listedItems[listing_id].delivered = 1;
         sellers_mapping[listedItems[listing_id].seller_id].transfer(listedItems[listing_id].price);
@@ -140,7 +137,6 @@ contract Netflix {
         require(reverse_buyers_mapping[msg.sender]!=0,"You are not a Buyer");
         require(listedItems[listing_id].buyer_id==reverse_buyers_mapping[msg.sender],"Item is not bought by you");
         require(listedItems[listing_id].bought==1,"Item not bought yet");
-        require(listedItems[listing_id].public_key_fetched==1,"Public Key Not Fetched Yet");
         require(listedItems[listing_id].delivered==1,"Item not delivered yet");
         string memory ret = listedItems[listing_id].encrypted_msg;
         return ret;
