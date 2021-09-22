@@ -109,7 +109,7 @@ contract Netflix {
         {
             listedItems[listing_id].bought = 1;
             listedItems[listing_id].buyer_public_key = _public_key;
-            listedItems[listing_id].buyer_id = buyers;
+            listedItems[listing_id].buyer_id = reverse_buyers_mapping[msg.sender];
         }
     }
 
