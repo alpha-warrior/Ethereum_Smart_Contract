@@ -26,6 +26,12 @@ contract Netflix {
 
     Item[] listedItems;
 
+    /**
+     * This internal pure function takes as input a uint_256 unsigned 256 integer and converts it to a string.
+     * @param _i The integer to be converted to string
+     * @return The string created from the input integer
+     */
+
     function uint2str(uint256 _i) internal pure returns (string memory str)
     {
         if (_i == 0)
@@ -50,6 +56,13 @@ contract Netflix {
         str = string(bstr);
     }
 
+    /**
+     * This public function is called by the Seller and takes as input the name, description and price of an item and adds it to the list for all the Buyers to see.
+     * @param _name The name of product being listed
+     * @param _description The description of product being listed
+     * @param _price The price of product being listed
+     */
+
     function listItem(string memory _name, string memory _description, uint _price) public
     {
         if(reverse_sellers_mapping[msg.sender]==0)
@@ -67,6 +80,11 @@ contract Netflix {
             listed_items++;
         }
     }
+
+    /**
+     * This public view function lists all the items currently listed along with Listing ID, Name, Description and Price
+     * @return The list is returned
+     */
 
     function viewAvailItems() public view returns(string memory)
     {
@@ -92,6 +110,14 @@ contract Netflix {
         return ret;
     }
 
+    /**
+     * This public payable function is called by a potential Buyer when he wants to buy a specific listed product.
+     * The buyer also gives the price of the prouct in the msg.value while calling which should exactly match with the listed price for a succesful transaction.
+     * The function transfers money (stages it) from the Buyer's account to the Contract's address.
+     * @param listing_id The listing id of the product the buyer is interested in buying.
+     * @param _pubilc_key The public key of the buyer which will then be encrypted by the seller and then decrupted later by the buyer
+     */
+
     function buyItem(uint listing_id,string memory _public_key) public payable
     {
         require(msg.value==listedItems[listing_id].price,"Wrong amount paid. Please pay the correct amount to claim your item.");
@@ -112,6 +138,12 @@ contract Netflix {
         }
     }
 
+    /**
+     * This public view function is called by the Seller of the listed product which was just bought to retrieve the public key of the Buyer to encrypt Password with.
+     * @param listing_id The listing id of the product the buyer just bought.
+     * @return The public key of the buyer
+     */
+
     function get_public_key(uint listing_id) public view returns(string memory)
     {
         require(reverse_sellers_mapping[msg.sender]!=0,"You are not a seller");
@@ -122,6 +154,13 @@ contract Netflix {
         return ret;
     }
 
+    /**
+     * This public payable function is called by the Seller of the listed product.
+     * This function takes in the cipher text created by the Seller and then transfers the Price of the product from the Contract's address to the Seller.
+     * @param message The encrypted cipher text created using the sensitive message and Buyer's public key.
+     * @param listing_id The listing id of the product the buyer just bought.
+     */
+
     function send_encrypted_string(string memory message,uint listing_id) public payable
     {
         require(reverse_sellers_mapping[msg.sender]!=0,"You are not a seller");
@@ -131,6 +170,13 @@ contract Netflix {
         listedItems[listing_id].delivered = 1;
         sellers_mapping[listedItems[listing_id].seller_id].transfer(listedItems[listing_id].price);
     } 
+
+    /**
+     * This public view function is called by the Buyer of the listed product.
+     * This function returns the cipher text to the Buyer.
+     * @param listing_id The listing id of the product the buyer just bought.
+     * @return The cipher text created by the Seller.
+     */
 
     function get_encrypted_string(uint listing_id) public view returns(string memory)
     {
