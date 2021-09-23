@@ -118,7 +118,7 @@ contract Netflix {
         require(reverse_sellers_mapping[msg.sender]!=0,"You are not a seller");
         require(listedItems[listing_id].seller_id==reverse_sellers_mapping[msg.sender],"Item is not listed by you");
         require(listedItems[listing_id].bought==1,"Item not bought yet");
-        listedItems[listing_id].public_key_fetched = 1;
+        // listedItems[listing_id].public_key_fetched = 1;
         string memory ret = listedItems[listing_id].buyer_public_key;
         
         return ret;
