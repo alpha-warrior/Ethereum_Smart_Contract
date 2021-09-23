@@ -12,9 +12,6 @@ const item2 = "screen2";
 
 contract("Netflix", (accounts) => {
     let [buyer, seller] = accounts;
-
-    // start here
-
     it("should be able to create a new zombie", async () => {
         const contractInstance = await Netflix.new();
         console.log("Starting test");
@@ -25,20 +22,25 @@ contract("Netflix", (accounts) => {
         await contractInstance.listItem("screen 2", "new Netflix Screen", 5, {from: seller});
         avail = await contractInstance.viewAvailItems({from: buyer});
         console.log(avail);
+        await contractInstance.buyItem(0, bpublic, {from: buyer, value:10});
+        let pk = await contractInstance.get_public_key(0, {from: seller});
+        assert.equal(pk, bpublic);
         const encrypted = await EthCrypto.encryptWithPublicKey(
-            bpublic, // encrypt with alice's publicKey
+            pk,
             item1
-          );
-        const decrypted = await EthCrypto.decryptWithPrivateKey(
-            bprivate,
-            encrypted
           );
         console.log("Encrypted string:")
         console.log(encrypted)
+        await contractInstance.send_encrypted_string(EthCrypto.cipher.stringify(encrypted) ,0, {from: seller});
+        let es = await contractInstance.get_encrypted_string(0, {from: buyer});
+        assert.equal(es, EthCrypto.cipher.stringify(encrypted));
+        const decrypted = await EthCrypto.decryptWithPrivateKey(
+            bprivate,
+            EthCrypto.cipher.parse(es)
+          );
         console.log("Decrypted string:")
         console.log(decrypted)
-        // await contractInstance.buyItem(1, bpublic, {from: buyer, value:web3.utils.toWei(10, "ether")});
+        assert.equal(decrypted, item1);
+        
     })
-
-    //define the new it() function
 })
