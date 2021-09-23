@@ -116,7 +116,7 @@ contract Netflix {
      * The buyer also gives the price of the prouct in the msg.value while calling which should exactly match with the listed price for a succesful transaction.
      * The function transfers money (stages it) from the Buyer's account to the Contract's address.
      * @param listing_id The listing id of the product the buyer is interested in buying.
-     * @param _pubilc_key The public key of the buyer which will then be encrypted by the seller and then decrupted later by the buyer
+     * @param _public_key The public key of the buyer which will then be encrypted by the seller and then decrupted later by the buyer
      */
 
     function buyItem(uint listing_id,string memory _public_key) public payable
