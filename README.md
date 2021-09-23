@@ -1,7 +1,7 @@
 # Ethereum Smart Contract to buy and sell Netflix Screens securely over a Blockchain
 This work was done for the course Distributing Trust and Blockchains offered in A2k21 by Dr. Sujit Gujjar. 
 
-### Team **KATana**: Kushagra, Akshit and Tathagata
+### Team **KATtana**: Kushagra, Akshit and Tathagata
 ---
 
 The project has been coded in **Solidity** and is deployed using **Truffle**. **Doxygen** comments are enabled for the code and can be accessed using the index.html file in the html folder.
