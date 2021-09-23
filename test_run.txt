@@ -1,4 +1,4 @@
-*************************  TEST CASE *************************  
+*************************  TEST CASE 1 *************************  
 
 ACCOUNT BALANCES in the start. After deployment:
 
@@ -247,3 +247,136 @@ I_am_the_Password_for_Screen2
   1 passing (850ms)
 
 **************************************************************************************************************************************
+
+*************************  TEST CASE 2 *************************  
+
+Let us again assume that accounts[1] is a Seller, accounts[2] is also a Seller and accounts[3] is a buyer.
+
+1) accounts[1] is now listing a screen up for sale.
+
+    truffle(develop)> await contractInstance.listItem("Screen 1", "new Netflix Screen", 1000000, {from: accounts[1]});
+    {
+    tx: '0x6b7850097ec54079dd023b7774369c606dd6db05f4b96c52929a956c0295ce2b',
+    receipt: {
+        transactionHash: '0x6b7850097ec54079dd023b7774369c606dd6db05f4b96c52929a956c0295ce2b',
+        transactionIndex: 0,
+        blockHash: '0x59126b600f3264f0a8f3400ebf969883074b10a4e9d2f723615f022b612e2798',
+        blockNumber: 6,
+        from: '0xc7808c60694ba0919a0e91736eaed0e2d5581c95',
+        to: '0x7cee8a45dfd1fbf0ec883a392322eff9b03c04c4',
+        gasUsed: 259343,
+        cumulativeGasUsed: 259343,
+
+2) accounts[2] is now listing a screen up for sale.
+
+    truffle(develop)> await contractInstance.listItem("Screen 2", "better Netflix Screen", 1, {from: accounts[2]});
+    {
+    tx: '0x6c5cf29f7e75fc59026b933a16225411c6766e71d25f33762fd4db6b317ad496',
+    receipt: {
+        transactionHash: '0x6c5cf29f7e75fc59026b933a16225411c6766e71d25f33762fd4db6b317ad496',
+        transactionIndex: 0,
+        blockHash: '0xea21878c0a16ede3f1d01504488f3b160eba61214929a6024dbde01900ce1fbc',
+        blockNumber: 7,
+        from: '0xb2d2168ea41b9cbb8a151b7ed23f45fb66d5507b',
+        to: '0x7cee8a45dfd1fbf0ec883a392322eff9b03c04c4',
+        gasUsed: 233555,
+        cumulativeGasUsed: 233555,
+
+3) Available listings now.
+
+    truffle(develop)> let avail = await contractInstance.viewAvailItems({from: accounts[3]});
+    undefined
+    truffle(develop)> avail
+    '\n' +
+    '\n' +
+    '**************************\n' +
+    'Listing Id: 0\n' +
+    'Name: Screen 1\n' +
+    'Description: new Netflix Screen\n' +
+    'Price: 1000000\n' +
+    '\n' +
+    '**************************\n' +
+    'Listing Id: 1\n' +
+    'Name: Screen 2\n' +
+    'Description: better Netflix Screen\n' +
+    'Price: 1\n' +
+    '***************************'
+
+4) Buyer likes Screen 2 as it is the Best Netflix screen so he buys it. But here we will make the buyer pay the wrong price.
+
+    truffle(develop)> await contractInstance.buyItem(1,
+    'c04f382fc16f3abffd922fac75c933daedc75c19fa3b1caf8212794fce6978213d4228c35c2413641c500919b2eb7440a620701f9dcbde8c3e5e0ac38881fa1a', 
+    {from: accounts[3], value:4});
+    Error: Returned error: VM Exception while processing transaction: revert Wrong amount paid. Please pay the correct amount to claim your item. 
+    -- Reason given: Wrong amount paid. Please pay the correct amount to claim your item..
+
+Therefore, the test ended as the buyer did not pay the asked price to the contract in the buyItem() function.
+
+
+*************************  TEST CASE 3 ************************* 
+
+Repeating the same steps (1 to 4) as Test case 2 with the only difference being that this time the Buyer pays the correct price during the BuyItem function call.
+
+5) At this point the Seller should try and fetch the Buyer's public key.
+
+    truffle(develop)> let pk = await contractInstance.get_public_key(1, {from: accounts[2]});
+    undefined
+    truffle(develop)> pk
+    'c04f382fc16f3abffd922fac75c933daedc75c19fa3b1caf8212794fce6978213d4228c35c2413641c500919b2eb7440a620701f9dcbde8c3e5e0ac38881fa1a'
+
+6) Now lets say someone else (accounts[5]) who was not the seller for Screen 2 now tries to encrypt a random string using a random key and tries to
+post it as the item's cipher text using send_encrypted_string(). This should definitely be not allowed.
+
+    truffle(develop)> const encrypted = await EthCrypto.encryptWithPublicKey(
+        "2adc02ad8e1f2610ed31f9b7bd2f06837370612e6cb979c8d6faef1e3d5b0234bbc183bd6766c0e96b6b5b63a8b0216fc69a08f8770edd64cc6f574f142b849c", 
+        "I_am_some_random_Password_created_by_Account5");
+    undefined
+    truffle(develop)> encrypted
+    {
+    iv: 'f31d61764aee73cbde2803248c71be00',
+    ephemPublicKey: '04e50c742725eb0abf2b51ebdbdf0ab4ff9556ce989711e76ca2e1ead2dee3403c92d8413a1747960f662b2919fa78d379105bc3830eab5305ca06c974046164d9',
+    ciphertext: '56d6b30e2919e8de4d04b6aa0665a15298772c0b85e47879e5a0b5d1205a505bac8239944bed28d6d46e7f0be6fc5bcd',
+    mac: 'dfd8cd1358ab66d0923430a25a268a251426ce455c196a532edb7b83ecae854e'
+    }
+    truffle(develop)> await contractInstance.send_encrypted_string(EthCrypto.cipher.stringify(encrypted) ,1, {from: accounts[5]});
+    Uncaught:
+    Error: Returned error: VM Exception while processing transaction: revert You are not a seller -- Reason given: You are not a seller.
+
+Therefore, the test ended and the random intruder could not violate the privacy of our contract.
+
+*************************  TEST CASE 4 ************************* 
+
+Repeating the same steps (1 to 6) from Test cases 2 and 3, we have now successfully encrypted the password and money has also been delivered to the Seller.
+Now what if a random intruder (accounts[4]) tries to use the get_encrypted_string() function and get the encrypted password. There is 2 levels of security here.
+
+7)  a) A random person who was not the buyer should not be allowed to get access to this encrypted string.
+        
+        truffle(develop)> let es = await contractInstance.get_encrypted_string(1, {from: accounts[4]});
+        Uncaught:
+        Error: Returned error: VM Exception while processing transaction: revert You are not a Buyer
+
+    b) Even if the buyer gets access to the encrypted strin he will not be able to decode it as it can only be decrypted using the Buyer's private key.
+
+        truffle(develop)> es
+        '6264fc59370b24946e4955347f23c0c0036e7e8318abadabff8c4e6bdf76b72df5d2ebbbdd701ae20f9886241d2d0a2f76cdc296dd71cbe5d774724667bc3d2f4fb092639265df5dc7676783f486910a962952e35b6e0e50a22d425406cfd1b32a42dcf9d722ea02f61b8e6781e9cff080'
+        truffle(develop)> const decrypted = await EthCrypto.decryptWithPrivateKey(sellerid.privateKey, EthCrypto.cipher.parse(es));
+        Uncaught Error: Bad MAC
+            at assert (/home/kushagra/Documents/A2k21/Blockchain/Assign1/Ethereum_Smart_Contract/node_modules/eccrypto/index.js:43:11)
+
+Therefore only when the encrypted string is decoded with the Buyer's private key can the Password be retrieved.
+
+        truffle(develop)> const decrypted = await EthCrypto.decryptWithPrivateKey(buyerid.privateKey, EthCrypto.cipher.parse(es));
+                undefined
+        truffle(develop)> decrypted
+        'I_am_the_Password_for_Screen2'
+
+********************************************************************************************************************************************************
+
+
+
+
+
+
+
+
+

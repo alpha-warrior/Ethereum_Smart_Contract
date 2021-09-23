@@ -56,7 +56,7 @@ Let us assume that accounts[1] is a Seller, accounts[2] is also a Seller and acc
         gasUsed: 259343,
         cumulativeGasUsed: 259343,``
 
-2) Let us see if the screen was listed for buyer (accounts[3]) to see.
+2. Let us see if the screen was listed for buyer (accounts[3]) to see.
 
     ``truffle(develop)> let avail = await contractInstance.viewAvailItems({from: accounts[3]});
     undefined
@@ -70,7 +70,7 @@ Let us assume that accounts[1] is a Seller, accounts[2] is also a Seller and acc
     'Price: 1000000\n' +
     '***************************'``
 
-3) accounts[2] is now listing a screen up for sale.
+3. accounts[2] is now listing a screen up for sale.
 
     ``truffle(develop)> await contractInstance.listItem("Screen 2", "The Best Netflix Screen", 500000, {from: accounts[2]});
     {
@@ -85,7 +85,7 @@ Let us assume that accounts[1] is a Seller, accounts[2] is also a Seller and acc
         gasUsed: 233603,
         cumulativeGasUsed: 233603,``
 
-4) Available listings now.
+4. Available listings now.
 
     ``truffle(develop)> avail = await contractInstance.viewAvailItems({from: accounts[3]});
     undefined
@@ -105,7 +105,7 @@ Let us assume that accounts[1] is a Seller, accounts[2] is also a Seller and acc
     'Price: 500000\n' +
     '***************************'``
 
-5) Buyer likes Screen 2 as it is the Best Netflix screen so he buys it.
+5. Buyer likes Screen 2 as it is the Best Netflix screen so he buys it.
 
     a) Buyer's account balance before the buy operation:
 
@@ -165,7 +165,7 @@ Let us assume that accounts[1] is a Seller, accounts[2] is also a Seller and acc
         'Price: 1000000\n' +
         '***************************'
 
-6) The Seller now needs to fetch the Buyer's public key:
+6. The Seller now needs to fetch the Buyer's public key:
 
     ``truffle(develop)> let pk = await contractInstance.get_public_key(1, {from: accounts[2]});
     undefined
@@ -173,7 +173,7 @@ Let us assume that accounts[1] is a Seller, accounts[2] is also a Seller and acc
     'c04f382fc16f3abffd922fac75c933daedc75c19fa3b1caf8212794fce6978213d4228c35c2413641c500919b2eb7440a620701f9dcbde8c3e5e0ac38881fa1a'``
 
 
-7) The Seller now encrypts the NETFLIX PASSWORD ("I_am_the_Password_for_Screen2") with the Buyer's public key:
+7. The Seller now encrypts the NETFLIX PASSWORD ("I_am_the_Password_for_Screen2") with the Buyer's public key:
 
     ``truffle(develop)> const encrypted = await EthCrypto.encryptWithPublicKey(pk, "I_am_the_Password_for_Screen2");
     undefined
@@ -185,7 +185,7 @@ Let us assume that accounts[1] is a Seller, accounts[2] is also a Seller and acc
     mac: '7718cbc31ce78c0bf1ba1ef0fefca92ce86a7e2747df44b5e6970b38d0a6ad0d'
     }``
 
-8) Now sending this encrypted ciphertext from seller:
+8. Now sending this encrypted ciphertext from seller:
 
     a) Sending the ciphertext:
 
@@ -207,14 +207,14 @@ Let us assume that accounts[1] is a Seller, accounts[2] is also a Seller and acc
         truffle(develop)> web3.eth.getBalance(accounts[2])
         '99999069934000500000'
 
-9) Now the buyer fetches this encrypted string:
+9. Now the buyer fetches this encrypted string:
 
     ``truffle(develop)> let es = await contractInstance.get_encrypted_string(1, {from: accounts[3]});
     undefined
     truffle(develop)> es
     '26905f9f4fca63658735cfe832fdbea603c5f99c6760a9259b7910a9e5d71d405d99df2c0eaa573b32fe09714f335a9c637718cbc31ce78c0bf1ba1ef0fefca92ce86a7e2747df44b5e6970b38d0a6ad0d6ce302c9bca84e958e47da1696b50ece95c446f0f2e6c261e74ffa334cb5a4a2'``
 
-10) The buyer now decrypts the encrypted string:
+10. The buyer now decrypts the encrypted string:
 
     ``truffle(develop)> const decrypted = await EthCrypto.decryptWithPrivateKey(buyerid.privateKey, EthCrypto.cipher.parse(es));
     undefined
