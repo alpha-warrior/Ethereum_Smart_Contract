@@ -15,17 +15,17 @@ contract Netflix {
         string encrypted_msg; /** Stores the cipher text encrypted by the Seller using the Buyer's public key if the product has been bought */
     }
 
-    uint sellers = 0; /**  Stores the number of sellers. This also acts as a key for the reverse mapping of sellers*/
-    uint buyers = 0; /**  Stores the number of buyers. This also acts as a key for the reverse mapping of buyers*/
-    uint listed_items = 0; /**  Stores the number of listed items created till date. This also acts as a unique identifier for newly created listed items*/
+    uint private sellers = 0; /**  Stores the number of sellers. This also acts as a key for the reverse mapping of sellers*/
+    uint private buyers = 0; /**  Stores the number of buyers. This also acts as a key for the reverse mapping of buyers*/
+    uint private listed_items = 0; /**  Stores the number of listed items created till date. This also acts as a unique identifier for newly created listed items*/
 
-    mapping (uint => address) buyers_mapping; /**  This mapping maps a buyer_id (proxy for value of "buyers" when the buyer first bought a product) to the address of the buyer's account*/
-    mapping (uint => address payable) sellers_mapping; /**  This mapping maps a seller_id (proxy for value of "sellers" when the seller first listed a product) to the address of the seller's account*/
+    mapping (uint => address) private buyers_mapping; /**  This mapping maps a buyer_id (proxy for value of "buyers" when the buyer first bought a product) to the address of the buyer's account*/
+    mapping (uint => address payable) private sellers_mapping; /**  This mapping maps a seller_id (proxy for value of "sellers" when the seller first listed a product) to the address of the seller's account*/
 
-    mapping (address => uint) reverse_buyers_mapping; /** This reverse mapping maps the address of a buyer's account to its buyer_id */
-    mapping (address => uint) reverse_sellers_mapping; /** This reverse mapping maps the address of a seller's account to its seller_id */
+    mapping (address => uint) private reverse_buyers_mapping; /** This reverse mapping maps the address of a buyer's account to its buyer_id */
+    mapping (address => uint) private reverse_sellers_mapping; /** This reverse mapping maps the address of a seller's account to its seller_id */
 
-    Item[] listedItems; /** This is a dynamic array of the listed items storing all the information about each item (represented as a struct) */
+    Item[] private listedItems; /** This is a dynamic array of the listed items storing all the information about each item (represented as a struct) */
 
     /**
      * This internal pure function takes as input a uint_256 unsigned 256 integer and converts it to a string.
