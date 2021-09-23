@@ -3,28 +3,29 @@ pragma solidity 0.5.16;
 
 contract Netflix {
     struct Item{
-        uint listing_id;
-        string name;
-        string description;
-        uint price;
-        uint seller_id;
-        uint bought;
-        uint delivered;
-        uint buyer_id;
-        string buyer_public_key;
-        string encrypted_msg;
+        uint listing_id; /** Stores the listing id, which is equal to the number of listed products till date at the time of listing */
+        string name; /** Stores the name of the listed product */
+        string description; /** Stores the desctiption of the listed product */
+        uint price; /** Stores the price of the listed product */
+        uint seller_id; /** Stores the seller_id of the listed product */
+        uint bought; /** Stores if the product has been bought yet. O for No, 1 for Yes */
+        uint delivered; /** Stores if the bought product has been delivered yet. O for No, 1 for Yes */
+        uint buyer_id; /** Stores the buyer_id if the product has been bought*/
+        string buyer_public_key; /** Stores the public key of the buyer if the product has been bought */
+        string encrypted_msg; /** Stores the cipher text encrypted by the Seller using the Buyer's public key if the product has been bought */
     }
 
-    uint sellers = 0;
-    uint buyers = 0;
-    uint listed_items = 0;
-    mapping (uint => address) buyers_mapping;
-    mapping (uint => address payable) sellers_mapping;
+    uint sellers = 0; /**  Stores the number of sellers. This also acts as a key for the reverse mapping of sellers*/
+    uint buyers = 0; /**  Stores the number of buyers. This also acts as a key for the reverse mapping of buyers*/
+    uint listed_items = 0; /**  Stores the number of listed items created till date. This also acts as a unique identifier for newly created listed items*/
 
-    mapping (address => uint) reverse_buyers_mapping;
-    mapping (address => uint) reverse_sellers_mapping;
+    mapping (uint => address) buyers_mapping; /**  This mapping maps a buyer_id (proxy for value of "buyers" when the buyer first bought a product) to the address of the buyer's account*/
+    mapping (uint => address payable) sellers_mapping; /**  This mapping maps a seller_id (proxy for value of "sellers" when the seller first listed a product) to the address of the seller's account*/
 
-    Item[] listedItems;
+    mapping (address => uint) reverse_buyers_mapping; /** This reverse mapping maps the address of a buyer's account to its buyer_id */
+    mapping (address => uint) reverse_sellers_mapping; /** This reverse mapping maps the address of a seller's account to its seller_id */
+
+    Item[] listedItems; /** This is a dynamic array of the listed items storing all the information about each item (represented as a struct) */
 
     /**
      * This internal pure function takes as input a uint_256 unsigned 256 integer and converts it to a string.
