@@ -12,7 +12,7 @@ const item2 = "screen2";
 
 contract("Netflix", (accounts) => {
     let [buyer, seller] = accounts;
-    it("should be able to create a new zombie", async () => {
+    it("simulates a whole transaction", async () => {
         const contractInstance = await Netflix.new();
         console.log("Starting test");
         let avail = await contractInstance.viewAvailItems({from: buyer});
